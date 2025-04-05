@@ -1,41 +1,36 @@
 {
   "expo": {
-    "name": "Uber",
+    "name": "uber",
     "slug": "uber",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
-    "ios": {
-      "supportsTablet": true
-    },
-    "web": {
-      "bundler": "metro",
-      "output": "static",
-      "favicon": "./assets/images/favicon.png"
-    },
     "splash": {
       "image": "./assets/images/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#2F80ED"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      }
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "server",
+      "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      "expo-router",
       [
-        "expo-splash-screen",
+        "expo-router",
         {
-          "android": {
-            "backgroundColor": "#0c7cff",
-            "image": "./assets/images/splash.png",
-            "imageWidth": 150
-          },
-          "ios": {
-            "backgroundColor": "#ffffff",
-            "image": "./assets/images/splash.png",
-            "resizeMode": "cover"
-          }
+          "origin": "https://uber.dev/"
         }
       ]
     ],
