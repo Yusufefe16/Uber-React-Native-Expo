@@ -12,7 +12,7 @@ const OAuth = () => {
     <View >
       <View className={"flex flex-row justify-center items-center mt-4 gap-x-3"}>
           <View className={"flex-1 h-[1px] bg-general-100"}></View>
-          <Text className={"text-lg h-[1px] bg-general-100"}>Or</Text>
+          <Text className={"text-lg"}>Or</Text>
           <View className={"flex-1 h-[1px] bg-general-100"}></View>
       </View>
 

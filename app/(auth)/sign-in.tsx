@@ -4,16 +4,46 @@ import {icons, images} from "@/constants";
 import InputField from "@/components/InputField";
 import CustomButton from "@/components/CustomButton";
 import OAuth from "@/components/OAuth";
-import {Link} from "expo-router";
+import {Link, useRouter} from "expo-router";
+import {useSignIn} from "@clerk/clerk-expo";
 
 const signIn = () => {
+    const { signIn, setActive, isLoaded } = useSignIn()
+    const router = useRouter()
+
     const [form, setForm] = React.useState({
         email: "",
         password: "",
     });
 
     const onSignInPress = async () => {
-        console.log("Sign in");
+        if (!isLoaded) return
+
+        // Start the sign-in process using the email and password provided
+        try {
+            const signInAttempt = await signIn!.create({
+                identifier: form.email,
+                password: form.password,
+            })
+
+            // If sign-in process is complete, set the created session as active
+            // and redirect the user
+            if (signInAttempt.status === 'complete') {
+                if (setActive) {
+                    await setActive({session: signInAttempt.createdSessionId})
+                    router.replace('/(root)/(tabs)/home')
+                }
+
+            } else {
+                // If the status isn't complete, check why. User might need to
+                // complete further steps.
+                console.error(JSON.stringify(signInAttempt, null, 2))
+            }
+        } catch (err) {
+            // See https://clerk.com/docs/custom-flows/error-handling
+            // for more info on error handling
+            console.error(JSON.stringify(err, null, 2))
+        }
     }
 
   return (
