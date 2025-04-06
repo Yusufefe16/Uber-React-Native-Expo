@@ -57,7 +57,7 @@ const signUp = () => {
                     <OAuth />
                     <Link href={"/sign-in"} className={"text-lg text-center text-general-200 mt-3"}>
                         <Text>Already have an account?</Text>
-                        <Text className={"text-primary-500"}>Log in</Text>
+                        <Text className={"text-primary-500"}> Log in</Text>
                     </Link>
                 </View>
             </View>
