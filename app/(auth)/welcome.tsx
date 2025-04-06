@@ -5,6 +5,7 @@ import {router} from "expo-router";
 import Swiper from "react-native-swiper";
 
 import { onboarding } from "@/constants";
+import CustomButton from "@/components/CustomButton";
 
 const Onboarding = () => {
     const swiperRef = useRef<Swiper>(null);
@@ -51,6 +52,10 @@ const Onboarding = () => {
                   </View>
               ))}
       </Swiper>
+          <CustomButton
+              title={isLastSlide ? "Get Started" : "Next"}
+              className={"w-11/12 mt-10"}
+              onPress={()=> isLastSlide ? router.replace("/(auth)/sign-up") : swiperRef.current?.scrollBy(1)}/>
       </SafeAreaView>
   );
 };
