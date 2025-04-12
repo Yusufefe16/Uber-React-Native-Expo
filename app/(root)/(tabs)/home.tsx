@@ -1,10 +1,13 @@
 import { useUser } from '@clerk/clerk-expo'
-import {ActivityIndicator, FlatList, Image, Text, TouchableOpacity, View} from 'react-native'
+import {FlatList, Image, Text, TouchableOpacity, View} from 'react-native'
+import * as Location from 'expo-location'
 import {SafeAreaView} from "react-native-safe-area-context";
 import RideCard from "@/components/RideCard";
 import {icons, images} from "@/constants";
 import GoogleTextInput from "@/components/GoogleTextInput";
 import Map from "@/components/Map";
+import { useLocationStore } from "@/store";
+import {useEffect, useState} from "react";
 
 const recentRides = [
     {
@@ -106,18 +109,46 @@ const recentRides = [
 ]
 
 const home = () => {
-    const { user } = useUser()
+    const { setUserLocation, setDestinationLocation } = useLocationStore()
+    const { user } = useUser();
+    const loading: boolean = true;
 
-    const handleSignOut = () => {
+    const [hasPermissions, setHasPermissions] = useState(false)
 
-    };
+    const handleSignOut = () => {};
 
     const handleDestinationPress = (location: {
         latitude: number;
         longitude: number;
         address: string;
-    }) => {
+        }) => {
     };
+
+    useEffect(() => {
+        const requestLocation = async () => {
+            let { status } = await Location.requestForegroundPermissionsAsync();
+
+            if (status !== 'granted') {
+                setHasPermissions(false);
+                return;
+            }
+
+            let location = await Location.getCurrentPositionAsync();
+
+            const address = await Location.reverseGeocodeAsync({
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude,
+            });
+
+            setUserLocation({
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude,
+                address: `${address[0].name}, ${address[0].region}`,
+            });
+        };
+
+        requestLocation()
+    }, [hasPermissions])
 
     return (
         <SafeAreaView className={"bg-general-500"}>
