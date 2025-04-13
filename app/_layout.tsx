@@ -31,7 +31,6 @@ export default function RootLayout() {
     if (!loaded) {
         return null;
     }
-
   return (
       <ClerkProvider publishableKey={process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!} tokenCache={tokenCache}>
           <ClerkLoaded>

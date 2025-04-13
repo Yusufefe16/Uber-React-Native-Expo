@@ -78,14 +78,13 @@ export const calculateRegion = (
     };
 };
 
-export const calculateDriverTimes = async (
-    {
-        markers,
-        userLatitude,
-        userLongitude,
-        destinationLatitude,
-        destinationLongitude,
-    }: {
+export const calculateDriverTimes = async ({
+                                               markers,
+                                               userLatitude,
+                                               userLongitude,
+                                               destinationLatitude,
+                                               destinationLongitude,
+                                           }: {
     markers: MarkerData[];
     userLatitude: number | null;
     userLongitude: number | null;
@@ -102,27 +101,58 @@ export const calculateDriverTimes = async (
 
     try {
         const timesPromises = markers.map(async (marker) => {
-            const responseToUser = await fetch(
-                `https://maps.googleapis.com/maps/api/directions/json?origin=${marker.latitude},${marker.longitude}&destination=${userLatitude},${userLongitude}&key=${directionsAPI}`,
-            );
-            const dataToUser = await responseToUser.json();
-            const timeToUser = dataToUser.routes[0].legs[0].duration.value; // Time in seconds
+            try {
+                // Fetch from driver to user
+                const res1 = await fetch(
+                    `https://maps.googleapis.com/maps/api/directions/json?origin=${marker.latitude},${marker.longitude}&destination=${userLatitude},${userLongitude}&key=${directionsAPI}`
+                );
+                const dataToUser = await res1.json();
 
-            const responseToDestination = await fetch(
-                `https://maps.googleapis.com/maps/api/directions/json?origin=${userLatitude},${userLongitude}&destination=${destinationLatitude},${destinationLongitude}&key=${directionsAPI}`,
-            );
-            const dataToDestination = await responseToDestination.json();
-            const timeToDestination =
-                dataToDestination.routes[0].legs[0].duration.value; // Time in seconds
+                if (
+                    dataToUser.status !== "OK" ||
+                    !dataToUser.routes?.[0]?.legs?.[0]
+                ) {
+                    console.warn("Directions to user failed:", dataToUser);
+                    return null; // Skip this marker
+                }
 
-            const totalTime = (timeToUser + timeToDestination) / 60; // Total time in minutes
-            const price = (totalTime * 0.5).toFixed(2); // Calculate price based on time
+                const timeToUser = dataToUser.routes[0].legs[0].duration.value;
 
-            return { ...marker, time: totalTime, price };
+                // Fetch from user to destination
+                const res2 = await fetch(
+                    `https://maps.googleapis.com/maps/api/directions/json?origin=${userLatitude},${userLongitude}&destination=${destinationLatitude},${destinationLongitude}&key=${directionsAPI}`
+                );
+                const dataToDestination = await res2.json();
+
+                if (
+                    dataToDestination.status !== "OK" ||
+                    !dataToDestination.routes?.[0]?.legs?.[0]
+                ) {
+                    console.warn("Directions to destination failed:", dataToDestination);
+                    return null; // Skip this marker
+                }
+
+                const timeToDestination =
+                    dataToDestination.routes[0].legs[0].duration.value;
+
+                const totalTime = (timeToUser + timeToDestination) / 60;
+                const price = (totalTime * 0.5).toFixed(2);
+
+                return {
+                    ...marker,
+                    time: totalTime,
+                    price,
+                };
+            } catch (innerError) {
+                console.error("Error with one marker:", innerError);
+                return null;
+            }
         });
 
-        return await Promise.all(timesPromises);
+        const results = await Promise.all(timesPromises);
+        return results.filter(Boolean); // remove nulls
     } catch (error) {
         console.error("Error calculating driver times:", error);
+        return [];
     }
 };
