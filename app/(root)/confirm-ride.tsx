@@ -19,14 +19,14 @@ const ConfirmRide = () => {
                     <DriverCard
                         item={item}
                         selected={selectedDriver!}
-                        setSelected={() => setSelectedDriver(item.id!)}
+                        setSelected={() => setSelectedDriver(Number(item.id)!)}
                     />
                 )}
                 ListFooterComponent={() => (
                     <View className="mx-5 mt-10">
                         <CustomButton
                             title="Select Ride"
-                            onPress={() => router.push("/(root)/book-ride.tsx")}
+                            onPress={() => router.push("/(root)/book-ride")}
                         />
                     </View>
                 )}
